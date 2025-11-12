@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Coloca el archivo de audio posada.mp3 en la misma carpeta que este index.html. -->
+  <!-- Coloca la imagen hero_santa.png (relación 16:9) en la misma carpeta que este index.html. -->
+  <!-- Configura los valores de FORM_ENDPOINT y READ_ENDPOINT (si aplica) con tu Google Apps Script. -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Posada de Parejas 2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-red-1: #5c0008;
+      --bg-red-2: #9b0014;
+      --bg-red-3: #b3001a;
+      --accent-green: #34d399;
+      --accent-gold: #ffd700;
+      --accent-gold-soft: rgba(255, 215, 0, 0.4);
+      --card-bg: rgba(20, 0, 0, 0.55);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-light: #fdf7f2;
+      --text-muted: rgba(253, 247, 242, 0.7);
+      --success: #4ade80;
+      --danger: #f87171;
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.45);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-light);
+      background: var(--bg-red-1);
+      min-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 50%),
+        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06), transparent 45%),
+        linear-gradient(135deg, var(--bg-red-1), var(--bg-red-2), var(--bg-red-3));
+      animation: bgShift 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .garland-wrap::before, .garland-wrap::after {
+      content: "";
+      position: fixed;
+      pointer-events: none;
+      inset: 12px;
+      border-radius: 32px;
+      border: 3px solid var(--accent-gold-soft);
+      box-shadow:
+        0 0 8px rgba(255, 215, 0, 0.4),
+        inset 0 0 18px rgba(255, 215, 0, 0.25);
+      z-index: 2;
+      animation: twinkle 4s ease-in-out infinite;
+    }
+
+    .garland-wrap::after {
+      inset: 18px;
+      border-radius: 36px;
+      border: 1px dashed rgba(255, 215, 0, 0.35);
+      animation-delay: 1.5s;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.5)); }
+      50% { opacity: 1; filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8)); }
+    }
+
+    #snow-canvas, #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #confetti-canvas {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    main {
+      position: relative;
+      z-index: 3;
+      padding: 120px 20px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .hero-img {
+      width: min(520px, 90vw);
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: var(--shadow-lg);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.8rem, 5vw, 4rem);
+      margin: 0;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      letter-spacing: 0.6em;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      margin-top: -10px;
+    }
+
+    .countdown {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .countdown-item {
+      min-width: 80px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      text-align: center;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    .countdown-item strong {
+      display: block;
+      font-size: 1.5rem;
+      font-family: 'Cinzel', serif;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid.two {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+    }
+
+    .card p {
+      margin: 6px 0;
+      line-height: 1.5;
+    }
+
+    .event-details p strong,
+    .fees-details p strong {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-green), #22c55e);
+      color: #04110c;
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-top: 16px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 20px rgba(34, 197, 94, 0.35);
+    }
+
+    .button-link:hover,
+    .button-link:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 28px rgba(34, 197, 94, 0.4);
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-light);
+      font-size: 1rem;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-gold);
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .form-grid.two {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .submit-btn {
+      padding: 14px 24px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-gold), #facc15);
+      color: #3c1c00;
+      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.35);
+    }
+
+    .submit-btn:hover,
+    .submit-btn:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(250, 204, 21, 0.45);
+    }
+
+    .status-message {
+      font-size: 0.95rem;
+      min-height: 20px;
+    }
+
+    .status-message.success {
+      color: var(--success);
+    }
+
+    .status-message.error {
+      color: var(--danger);
+    }
+
+    .stats {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.8rem;
+      margin-top: 6px;
+      font-family: 'Cinzel', serif;
+      color: var(--accent-gold);
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    canvas.chart {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .playlist-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .playlist-note {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .access-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 0, 0, 0.92);
+      backdrop-filter: blur(18px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .access-card {
+      max-width: 420px;
+      width: 100%;
+      padding: 32px;
+      background: rgba(20, 0, 0, 0.85);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.55);
+      text-align: center;
+    }
+
+    .access-card h2 {
+      margin-top: 0;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .access-card button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-green), #22c55e);
+      color: #04110c;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .access-card button:hover,
+    .access-card button:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 24px rgba(34, 197, 94, 0.35);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (min-width: 768px) {
+      main {
+        padding: 140px 40px 80px;
+        gap: 44px;
+      }
+
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .charts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="garland-wrap"></div>
+  <canvas id="snow-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <audio id="bg-audio" src="posada.mp3" preload="auto" loop autoplay muted></audio>
+
+  <div class="access-overlay" id="access-overlay" aria-modal="true" role="dialog">
+    <div class="access-card">
+      <h2>Acceso</h2>
+      <p>Ingresa la contraseña para ver la invitación.</p>
+      <form id="access-form">
+        <label for="access-password">Contraseña</label>
+        <input type="password" id="access-password" autocomplete="current-password" required aria-required="true" placeholder="********">
+        <button type="submit">Desbloquear</button>
+        <p class="status-message" id="access-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <main id="main-content" hidden>
+    <header>
+      <div class="hero-img">
+        <img src="hero_santa.png" alt="Santa con renos modernos">
+      </div>
+      <div>
+        <h1>Posada de Parejas 2025</h1>
+        <p class="subtitle">TAMPICO</p>
+      </div>
+      <div class="countdown" aria-live="polite" id="countdown">
+        <div class="countdown-item"><strong id="days">00</strong><span>Días</span></div>
+        <div class="countdown-item"><strong id="hours">00</strong><span>Horas</span></div>
+        <div class="countdown-item"><strong id="minutes">00</strong><span>Min</span></div>
+        <div class="countdown-item"><strong id="seconds">00</strong><span>Seg</span></div>
+      </div>
+    </header>
+
+    <section class="grid two">
+      <article class="card event-details">
+        <h2>Detalles del Evento</h2>
+        <p><strong>Fecha:</strong> 29 de noviembre de 2025</p>
+        <p><strong>Hora:</strong> 19:00 h</p>
+        <p><strong>Dress code:</strong> Formal</p>
+        <p><strong>Lugar:</strong> Casa de los Navarrete Feres</p>
+        <p><strong>Dirección:</strong> Herradura 302A, Col. El Charro, CP 89364, Tampico, Tamaulipas</p>
+        <p><strong>Google Maps:</strong> <a href="https://maps.app.goo.gl/6ZbxJhXpWGxEddrS6" target="_blank" rel="noopener" class="button-link" style="padding:10px 18px;font-size:0.95rem;">Abrir mapa</a></p>
+      </article>
+
+      <article class="card fees-details">
+        <h2>Cuota y Adelantos</h2>
+        <p><strong>Cuota inicial:</strong> $500.00 MXN por invitado para apartar proveedores.</p>
+        <p>Es presupuesto estimado; al final los costos reales se reparten entre el total de asistentes.</p>
+        <p><strong>Banco:</strong> Santander</p>
+        <p><strong>Cuenta:</strong> 5579 0990 1439 0373</p>
+        <p><strong>Nombre:</strong> Humberto González</p>
+        <p><strong>Concepto:</strong> Nombres de invitados que transfirieron</p>
+      </article>
+    </section>
+
+    <section class="card playlist-wrap">
+      <h2>Playlist Colaborativa</h2>
+      <p class="playlist-note">Agrega tus canciones favoritas para la Posada.</p>
+      <a class="button-link" href="https://open.spotify.com/playlist/0xlJMquNBMNGLfVCE1j4pU?si=sdt8ObrCQT-CMTrLgXKY5w&pi=7UpYbFdsQmKAL" target="_blank" rel="noopener">Abrir en Spotify</a>
+    </section>
+
+    <section class="card">
+      <h2>RSVP</h2>
+      <p>Confirma tu asistencia y comparte detalles importantes para la organización.</p>
+      <form id="rsvp-form" novalidate>
+        <div class="form-grid two">
+          <div>
+            <label for="nombre">Nombre *</label>
+            <input type="text" id="nombre" name="nombre" required autocomplete="given-name">
+          </div>
+          <div>
+            <label for="apellido">Apellido *</label>
+            <input type="text" id="apellido" name="apellido" required autocomplete="family-name">
+          </div>
+        </div>
+        <div class="form-grid two">
+          <div>
+            <label for="asistencia">Asistencia *</label>
+            <select id="asistencia" name="asistencia" required>
+              <option value="" disabled selected>Selecciona una opción</option>
+              <option value="Sí">Sí</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div>
+            <label for="participa">¿Participas en la organización?</label>
+            <select id="participa" name="participa">
+              <option value="No" selected>No</option>
+              <option value="Sí">Sí</option>
+            </select>
+          </div>
+        </div>
+        <div id="comite-field" hidden>
+          <label for="comite">Comité *</label>
+          <select id="comite" name="comite" disabled>
+            <option value="" disabled selected>Selecciona un comité</option>
+          </select>
+          <p id="comite-status" class="playlist-note" aria-live="polite"></p>
+        </div>
+        <div>
+          <label for="comentarios">Comentarios / Restricciones</label>
+          <textarea id="comentarios" name="comentarios" placeholder="Alimentación, alergias u otras notas."></textarea>
+        </div>
+        <div class="form-grid two">
+          <div>
+            <label for="monto">Monto pagado (MXN)</label>
+            <input type="number" id="monto" name="monto" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="fecha">Fecha de depósito</label>
+            <input type="date" id="fecha" name="fecha">
+          </div>
+        </div>
+        <div>
+          <label for="ficha">Ficha de depósito (PDF/JPG/PNG, máx 4 MB)</label>
+          <input type="file" id="ficha" name="ficha" accept="application/pdf,image/png,image/jpeg">
+        </div>
+        <button class="submit-btn" type="submit">Enviar confirmación</button>
+        <p class="status-message" id="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Estadísticas</h2>
+      <div class="stats">
+        <div class="stat-card">
+          <h3>Invitados confirmados</h3>
+          <strong id="total-confirmados">0</strong>
+        </div>
+        <div class="stat-card">
+          <h3>Con pago registrado</h3>
+          <strong id="total-pagados">0</strong>
+        </div>
+        <div class="stat-card">
+          <h3>Budget recabado</h3>
+          <strong id="total-budget">$0.00</strong>
+        </div>
+      </div>
+      <div class="charts">
+        <canvas id="bar-chart" class="chart" width="400" height="240" aria-label="Barras de confirmados vs pagados" role="img"></canvas>
+        <canvas id="pie-chart" class="chart" width="400" height="240" aria-label="Distribución por comité" role="img"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © Posada de Parejas 2025 – Casa de los Navarrete Feres.
+  </footer>
+
+  <script>
+    const FORM_ENDPOINT = "YOUR_APPS_SCRIPT_WEB_APP_URL"; // reemplazar
+    const READ_ENDPOINT = ""; // opcional (si existe doGet)
+    const ACCESS_HASH = "15f2e37004fb9837d1ff1e0edba3f118a81855f2ddc52451f3ce44a1737bfc3c";
+
+    const committeesList = [
+      "Comité de Comida, Mesas & Losa",
+      "Comité de Bebidas, Alcohol & Shots",
+      "Comité de Música & Ambiente",
+      "Comité de Juegos & Dinámicas",
+      "Comité de Decoración & Fotografía",
+      "Comité de Mensaje & Espíritu Navideño",
+      "Comité de Orden & Limpieza",
+      "Comité de Estrategia & Finanzas"
+    ];
+
+    const state = {
+      responses: [],
+      localSubmissions: [],
+      committeeCounts: {},
+      snowflakes: [],
+      confettiPieces: [],
+      confettiActive: false,
+    };
+
+    const countdownTarget = new Date('2025-11-29T19:00:00-06:00');
+
+    const snowCanvas = document.getElementById('snow-canvas');
+    const snowCtx = snowCanvas.getContext('2d');
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+
+    function resizeCanvas(canvas, ctx) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+
+    function initSnowflakes() {
+      state.snowflakes = Array.from({ length: 120 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: Math.random() * 2.5 + 0.5,
+        speedY: Math.random() * 1.5 + 0.5,
+        sway: Math.random() * 2,
+        swaySpeed: Math.random() * 0.02 + 0.005,
+        swayAngle: Math.random() * Math.PI * 2
+      }));
+    }
+
+    function drawSnow() {
+      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      snowCtx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      state.snowflakes.forEach(flake => {
+        flake.swayAngle += flake.swaySpeed;
+        flake.x += Math.sin(flake.swayAngle) * flake.sway;
+        flake.y += flake.speedY;
+        if (flake.y > window.innerHeight) {
+          flake.y = -5;
+          flake.x = Math.random() * window.innerWidth;
+        }
+        snowCtx.beginPath();
+        snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        snowCtx.fill();
+      });
+      requestAnimationFrame(drawSnow);
+    }
+
+    function initConfetti() {
+      const colors = ['#facc15', '#fef3c7', '#34d399', '#f87171', '#fbbf24'];
+      state.confettiPieces = Array.from({ length: 200 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * -window.innerHeight,
+        size: Math.random() * 6 + 4,
+        rotation: Math.random() * 360,
+        speedY: Math.random() * 3 + 3,
+        speedX: Math.random() * 1.5 - 0.75,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+    }
+
+    function drawConfetti() {
+      if (!state.confettiActive) return;
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      state.confettiPieces.forEach(piece => {
+        piece.x += piece.speedX;
+        piece.y += piece.speedY;
+        piece.rotation += piece.speedX * 6;
+        if (piece.y > window.innerHeight) {
+          piece.y = -10;
+          piece.x = Math.random() * window.innerWidth;
+        }
+        confettiCtx.save();
+        confettiCtx.translate(piece.x, piece.y);
+        confettiCtx.rotate(piece.rotation * Math.PI / 180);
+        confettiCtx.fillStyle = piece.color;
+        confettiCtx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size * 0.6);
+        confettiCtx.restore();
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function startConfetti() {
+      state.confettiActive = true;
+      confettiCanvas.style.opacity = 1;
+      initConfetti();
+      drawConfetti();
+      setTimeout(() => {
+        state.confettiActive = false;
+        confettiCanvas.style.opacity = 0;
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }, 4000);
+    }
+
+    async function hashPassword(value) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(digest));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function handleAccess(event) {
+      event.preventDefault();
+      const passwordInput = document.getElementById('access-password');
+      const status = document.getElementById('access-status');
+      const password = passwordInput.value.trim();
+      if (!password) return;
+      status.textContent = 'Verificando...';
+      try {
+        const hash = await hashPassword(password);
+        if (hash === ACCESS_HASH) {
+          sessionStorage.setItem('posadaAccess', 'true');
+          document.getElementById('access-overlay').style.display = 'none';
+          document.getElementById('main-content').hidden = false;
+          initApp();
+        } else {
+          status.textContent = 'Contraseña incorrecta. Intenta nuevamente.';
+        }
+      } catch (error) {
+        status.textContent = 'No se pudo verificar la contraseña.';
+      }
+    }
+
+    function attemptAudioPlayback() {
+      const audio = document.getElementById('bg-audio');
+      const playAudio = () => {
+        audio.muted = false;
+        audio.play().catch(() => {});
+      };
+      audio.play().then(() => {
+        audio.muted = false;
+      }).catch(() => {
+        const unlock = () => {
+          playAudio();
+          document.removeEventListener('click', unlock);
+          document.removeEventListener('touchstart', unlock);
+        };
+        document.addEventListener('click', unlock, { once: true });
+        document.addEventListener('touchstart', unlock, { once: true });
+      });
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = countdownTarget.getTime() - now.getTime();
+      const daysEl = document.getElementById('days');
+      const hoursEl = document.getElementById('hours');
+      const minutesEl = document.getElementById('minutes');
+      const secondsEl = document.getElementById('seconds');
+      if (diff <= 0) {
+        daysEl.textContent = '00';
+        hoursEl.textContent = '00';
+        minutesEl.textContent = '00';
+        secondsEl.textContent = '00';
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      daysEl.textContent = String(days).padStart(2, '0');
+      hoursEl.textContent = String(hours).padStart(2, '0');
+      minutesEl.textContent = String(minutes).padStart(2, '0');
+      secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    function populateCommitteeSelect() {
+      const select = document.getElementById('comite');
+      select.innerHTML = '<option value="" disabled selected>Selecciona un comité</option>';
+      committeesList.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    function updateCommitteeCapacity() {
+      const select = document.getElementById('comite');
+      const comiteStatus = document.getElementById('comite-status');
+      const totalConfirmed = getTotalConfirmed();
+      const maxPerCommittee = Math.max(1, Math.ceil(totalConfirmed / committeesList.length));
+      comiteStatus.textContent = totalConfirmed > 0 ? `Capacidad actual por comité: ${maxPerCommittee} integrante(s).` : 'Capacidad dinámica en cuanto existan confirmados.';
+      Array.from(select.options).forEach(option => {
+        if (!option.value) return;
+        const count = state.committeeCounts[option.value] || 0;
+        option.disabled = count >= maxPerCommittee;
+      });
+      const selected = select.value;
+      if (selected && select.options[select.selectedIndex]?.disabled) {
+        select.value = '';
+      }
+    }
+
+    function getTotalConfirmed() {
+      return state.responses.filter(item => (item.asistencia || '').toString().toLowerCase().startsWith('s')).length;
+    }
+
+    function getTotalPaid() {
+      return state.responses.filter(item => {
+        const monto = parseFloat(item.montoPagado || item.monto || '0');
+        const fecha = item.fechaDeposito || item.fecha || '';
+        return !Number.isNaN(monto) && monto > 0 && fecha;
+      }).length;
+    }
+
+    function getBudgetSum() {
+      return state.responses.reduce((acc, item) => {
+        const monto = parseFloat(item.montoPagado || item.monto || '0');
+        return acc + (Number.isNaN(monto) ? 0 : monto);
+      }, 0);
+    }
+
+    function updateCommitteeCounts() {
+      state.committeeCounts = {};
+      state.responses.forEach(item => {
+        const comite = item.comite || item.comité || '';
+        const participa = (item.participa || '').toString().toLowerCase().startsWith('s');
+        if (participa && comite) {
+          state.committeeCounts[comite] = (state.committeeCounts[comite] || 0) + 1;
+        }
+      });
+    }
+
+    function updateStats() {
+      updateCommitteeCounts();
+      const totalConfirmados = getTotalConfirmed();
+      const totalPagados = getTotalPaid();
+      const budget = getBudgetSum();
+      document.getElementById('total-confirmados').textContent = totalConfirmados;
+      document.getElementById('total-pagados').textContent = totalPagados;
+      document.getElementById('total-budget').textContent = budget.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+      updateCommitteeCapacity();
+      drawBarChart(totalConfirmados, totalPagados);
+      drawPieChart();
+    }
+
+    function drawBarChart(confirmados, pagados) {
+      const ctx = document.getElementById('bar-chart').getContext('2d');
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+
+      const maxValue = Math.max(confirmados, pagados, 1);
+      const barWidth = 120;
+      const gap = 80;
+      const margin = (width - (2 * barWidth + gap)) / 2;
+
+      const bars = [
+        { label: 'Confirmados', value: confirmados, color: '#ffd700' },
+        { label: 'Pagados', value: pagados, color: '#34d399' }
+      ];
+
+      ctx.font = '16px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(253, 247, 242, 0.8)';
+
+      bars.forEach((bar, index) => {
+        const x = margin + index * (barWidth + gap);
+        const barHeight = (bar.value / maxValue) * (height - 80);
+        ctx.fillStyle = bar.color;
+        const gradient = ctx.createLinearGradient(x, height - 40 - barHeight, x, height - 40);
+        gradient.addColorStop(0, bar.color);
+        gradient.addColorStop(1, bar.color + 'AA');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        const radius = 12;
+        ctx.moveTo(x, height - 40);
+        ctx.lineTo(x, height - 40 - barHeight + radius);
+        ctx.quadraticCurveTo(x, height - 40 - barHeight, x + radius, height - 40 - barHeight);
+        ctx.lineTo(x + barWidth - radius, height - 40 - barHeight);
+        ctx.quadraticCurveTo(x + barWidth, height - 40 - barHeight, x + barWidth, height - 40 - barHeight + radius);
+        ctx.lineTo(x + barWidth, height - 40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = 'rgba(253, 247, 242, 0.85)';
+        ctx.fillText(bar.label, x + barWidth / 2, height - 16);
+        ctx.fillText(bar.value, x + barWidth / 2, height - 50 - barHeight);
+      });
+    }
+
+    function drawPieChart() {
+      const ctx = document.getElementById('pie-chart').getContext('2d');
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      const radius = Math.min(width, height) / 2 - 20;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const entries = Object.entries(state.committeeCounts);
+      const total = entries.reduce((acc, [, value]) => acc + value, 0);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+
+      if (total === 0) {
+        ctx.fillStyle = 'rgba(253, 247, 242, 0.7)';
+        ctx.font = '16px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sin integrantes asignados aún', centerX, centerY);
+        return;
+      }
+
+      const colors = ['#ffd700', '#facc15', '#fef3c7', '#34d399', '#4ade80', '#f87171', '#fbbf24', '#fb7185'];
+      let startAngle = -Math.PI / 2;
+      entries.forEach(([label, value], index) => {
+        const sliceAngle = (value / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.fillStyle = colors[index % colors.length];
+        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+        const midAngle = startAngle + sliceAngle / 2;
+        const textX = centerX + Math.cos(midAngle) * (radius * 0.65);
+        const textY = centerY + Math.sin(midAngle) * (radius * 0.65);
+        ctx.fillStyle = '#240000';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(value, textX, textY + 6);
+        startAngle += sliceAngle;
+      });
+    }
+
+    async function fetchResponses() {
+      if (!READ_ENDPOINT) {
+        state.responses = [...state.localSubmissions];
+        updateStats();
+        return;
+      }
+      try {
+        const res = await fetch(READ_ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Error al obtener datos');
+        const data = await res.json();
+        let records = [];
+        if (Array.isArray(data)) {
+          records = data;
+        } else if (Array.isArray(data.responses)) {
+          records = data.responses;
+        } else if (Array.isArray(data.data)) {
+          records = data.data;
+        }
+        state.responses = [...records, ...state.localSubmissions];
+        updateStats();
+      } catch (error) {
+        console.error('No se pudieron obtener datos remotos', error);
+        state.responses = [...state.localSubmissions];
+        updateStats();
+      }
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const status = document.getElementById('form-status');
+      status.textContent = '';
+
+      if (!FORM_ENDPOINT || FORM_ENDPOINT === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+        status.textContent = 'Configura FORM_ENDPOINT antes de enviar.';
+        status.className = 'status-message error';
+        return;
+      }
+
+      if (!form.checkValidity()) {
+        status.textContent = 'Revisa los campos obligatorios.';
+        status.className = 'status-message error';
+        form.reportValidity();
+        return;
+      }
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const apellido = document.getElementById('apellido').value.trim();
+      const asistencia = document.getElementById('asistencia').value;
+      const comentarios = document.getElementById('comentarios').value.trim();
+      const participa = document.getElementById('participa').value;
+      const comiteSelect = document.getElementById('comite');
+      const comite = comiteSelect && !comiteSelect.disabled ? comiteSelect.value : '';
+      const monto = document.getElementById('monto').value;
+      const fecha = document.getElementById('fecha').value;
+      const fichaInput = document.getElementById('ficha');
+      const ts = new Date().toISOString();
+
+      if (participa === 'Sí') {
+        if (!comite) {
+          status.textContent = 'Selecciona un comité para participar.';
+          status.className = 'status-message error';
+          comiteSelect.focus();
+          return;
+        }
+      }
+
+      const file = fichaInput.files[0];
+      if (file && file.size > 4 * 1024 * 1024) {
+        status.textContent = 'La ficha supera el tamaño máximo de 4 MB.';
+        status.className = 'status-message error';
+        return;
+      }
+
+      status.textContent = 'Enviando...';
+      status.className = 'status-message';
+
+      const processSubmission = async (payload) => {
+        try {
+          const response = await fetch(FORM_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error('Error en el envío');
+          status.textContent = '¡Gracias! Registro recibido.';
+          status.className = 'status-message success';
+          form.reset();
+          document.getElementById('participa').value = 'No';
+          document.getElementById('comite').value = '';
+          document.getElementById('comite-field').hidden = true;
+          document.getElementById('comite').disabled = true;
+          state.localSubmissions.push(payload);
+          await fetchResponses();
+          startConfetti();
+        } catch (error) {
+          status.textContent = 'No se pudo enviar. Intenta más tarde.';
+          status.className = 'status-message error';
+        }
+      };
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1];
+          const payload = {
+            nombre,
+            apellido,
+            asistencia,
+            comentarios,
+            participa,
+            comite,
+            montoPagado: monto,
+            fechaDeposito: fecha,
+            fichaDeposito: base64 || '',
+            fichaMime: file.type,
+            ts
+          };
+          processSubmission(payload);
+        };
+        reader.onerror = () => {
+          status.textContent = 'No se pudo leer la ficha de depósito.';
+          status.className = 'status-message error';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const payload = {
+          nombre,
+          apellido,
+          asistencia,
+          comentarios,
+          participa,
+          comite,
+          montoPagado: monto,
+          fechaDeposito: fecha,
+          fichaDeposito: '',
+          fichaMime: '',
+          ts
+        };
+        processSubmission(payload);
+      }
+    }
+
+    function handleParticipaChange() {
+      const participa = document.getElementById('participa');
+      const comiteField = document.getElementById('comite-field');
+      const comiteSelect = document.getElementById('comite');
+      if (participa.value === 'Sí') {
+        comiteField.hidden = false;
+        comiteSelect.disabled = false;
+        comiteSelect.required = true;
+      } else {
+        comiteField.hidden = true;
+        comiteSelect.disabled = true;
+        comiteSelect.required = false;
+        comiteSelect.value = '';
+      }
+    }
+
+    function initListeners() {
+      document.getElementById('rsvp-form').addEventListener('submit', handleSubmit);
+      document.getElementById('participa').addEventListener('change', () => {
+        handleParticipaChange();
+        updateCommitteeCapacity();
+      });
+      document.getElementById('asistencia').addEventListener('change', () => {
+        updateCommitteeCapacity();
+      });
+      window.addEventListener('resize', () => {
+        resizeCanvas(snowCanvas, snowCtx);
+        resizeCanvas(confettiCanvas, confettiCtx);
+      });
+    }
+
+    function initApp() {
+      resizeCanvas(snowCanvas, snowCtx);
+      resizeCanvas(confettiCanvas, confettiCtx);
+      initSnowflakes();
+      drawSnow();
+      populateCommitteeSelect();
+      handleParticipaChange();
+      initListeners();
+      attemptAudioPlayback();
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+      fetchResponses();
+    }
+
+    document.getElementById('access-form').addEventListener('submit', handleAccess);
+
+    if (sessionStorage.getItem('posadaAccess') === 'true') {
+      document.getElementById('access-overlay').style.display = 'none';
+      document.getElementById('main-content').hidden = false;
+      initApp();
+    }
+  </script>
+</body>
+</html>
